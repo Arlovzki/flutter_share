@@ -17,6 +17,9 @@ final usersRef = Firestore.instance.collection('users');
 final postsRef = Firestore.instance.collection('posts');
 final commentsRef = Firestore.instance.collection('comments');
 final activityFeedRef = Firestore.instance.collection('feed');
+final followersRef = Firestore.instance.collection('followers');
+final followingRef = Firestore.instance.collection('following');
+final timelineRef = Firestore.instance.collection('timeline');
 final DateTime timestamp = DateTime.now();
 User currentUser;
 
@@ -48,9 +51,9 @@ class _HomeState extends State<Home> {
     });
   }
 
-  handleSignIn(GoogleSignInAccount account) {
+  handleSignIn(GoogleSignInAccount account) async {
     if (account != null) {
-      createUserInFirestore();
+      await createUserInFirestore();
       setState(() {
         isAuth = true;
       });
@@ -81,6 +84,12 @@ class _HomeState extends State<Home> {
         "bio": "",
         "timestamp": timestamp
       });
+      // make new user their own follower (to include their posts in their timeline)
+      await followersRef
+          .document(user.id)
+          .collection('userFollowers')
+          .document(user.id)
+          .setData({});
 
       doc = await usersRef.document(user.id).get();
     }
@@ -120,11 +129,7 @@ class _HomeState extends State<Home> {
     return Scaffold(
       body: PageView(
         children: <Widget>[
-          // Timeline(),
-          RaisedButton(
-            child: Text('Logout'),
-            onPressed: logout,
-          ),
+          Timeline(currentUser: currentUser),
           ActivityFeed(),
           Upload(currentUser: currentUser),
           Search(),

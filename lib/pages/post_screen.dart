@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_share/pages/home.dart';
 import 'package:flutter_share/widgets/header.dart';
 import 'package:flutter_share/widgets/post.dart';
 import 'package:flutter_share/widgets/progress.dart';
-
-import 'home.dart';
 
 class PostScreen extends StatelessWidget {
   final String userId;
   final String postId;
 
-  PostScreen({this.postId, this.userId});
+  PostScreen({this.userId, this.postId});
 
   @override
   Widget build(BuildContext context) {
@@ -28,10 +27,13 @@ class PostScreen extends StatelessWidget {
           child: Scaffold(
             appBar: header(context, titleText: post.description),
             body: ListView(
-              children: [
-                Container(
-                  child: post,
-                ),
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 10.0),
+                  child: Container(
+                    child: post,
+                  ),
+                )
               ],
             ),
           ),

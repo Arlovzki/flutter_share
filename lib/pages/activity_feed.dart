@@ -1,12 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_share/pages/home.dart';
 import 'package:flutter_share/pages/post_screen.dart';
+import 'package:flutter_share/pages/profile.dart';
 import 'package:flutter_share/widgets/header.dart';
 import 'package:flutter_share/widgets/progress.dart';
 import 'package:timeago/timeago.dart' as timeago;
-
-import 'home.dart';
 
 class ActivityFeed extends StatefulWidget {
   @override
@@ -17,13 +17,14 @@ class _ActivityFeedState extends State<ActivityFeed> {
   getActivityFeed() async {
     QuerySnapshot snapshot = await activityFeedRef
         .document(currentUser.id)
-        .collection("feedItems")
+        .collection('feedItems')
         .orderBy('timestamp', descending: true)
         .limit(50)
         .getDocuments();
     List<ActivityFeedItem> feedItems = [];
     snapshot.documents.forEach((doc) {
       feedItems.add(ActivityFeedItem.fromDocument(doc));
+      // print('Activity Feed Item: ${doc.data}');
     });
     return feedItems;
   }
@@ -31,20 +32,20 @@ class _ActivityFeedState extends State<ActivityFeed> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey,
       appBar: header(context, titleText: "Activity Feed"),
       body: Container(
-        child: FutureBuilder(
-          future: getActivityFeed(),
-          builder: (context, snapshot) {
-            if (!snapshot.hasData) {
-              return circularProgress();
-            }
-            return ListView(
-              children: snapshot.data,
-            );
-          },
-        ),
-      ),
+          child: FutureBuilder(
+        future: getActivityFeed(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return circularProgress();
+          }
+          return ListView(
+            children: snapshot.data,
+          );
+        },
+      )),
     );
   }
 }
@@ -55,7 +56,7 @@ String activityItemText;
 class ActivityFeedItem extends StatelessWidget {
   final String username;
   final String userId;
-  final String type; //  'like' , 'follow' , 'comment'
+  final String type; // 'like', 'follow', 'comment'
   final String mediaUrl;
   final String postId;
   final String userProfileImg;
@@ -78,22 +79,24 @@ class ActivityFeedItem extends StatelessWidget {
       username: doc['username'],
       userId: doc['userId'],
       type: doc['type'],
-      mediaUrl: doc['mediaUrl'],
       postId: doc['postId'],
       userProfileImg: doc['userProfileImg'],
       commentData: doc['commentData'],
       timestamp: doc['timestamp'],
+      mediaUrl: doc['mediaUrl'],
     );
   }
 
   showPost(context) {
     Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => PostScreen(
-                  postId: postId,
-                  userId: userId,
-                )));
+      context,
+      MaterialPageRoute(
+        builder: (context) => PostScreen(
+          postId: postId,
+          userId: userId,
+        ),
+      ),
+    );
   }
 
   configureMediaPreview(context) {
@@ -104,27 +107,27 @@ class ActivityFeedItem extends StatelessWidget {
           height: 50.0,
           width: 50.0,
           child: AspectRatio(
-            aspectRatio: 16 / 9,
-            child: Container(
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  fit: BoxFit.cover,
-                  image: CachedNetworkImageProvider(mediaUrl),
+              aspectRatio: 16 / 9,
+              child: Container(
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    fit: BoxFit.cover,
+                    image: CachedNetworkImageProvider(mediaUrl),
+                  ),
                 ),
-              ),
-            ),
-          ),
+              )),
         ),
       );
     } else {
       mediaPreview = Text('');
     }
-    if (type == "like") {
+
+    if (type == 'like') {
       activityItemText = "liked your post";
-    } else if (type == "follow") {
+    } else if (type == 'follow') {
       activityItemText = "is following you";
-    } else if (type == "comment") {
-      activityItemText = "replied: $commentData";
+    } else if (type == 'comment') {
+      activityItemText = 'replied: $commentData';
     } else {
       activityItemText = "Error: Unknown type '$type'";
     }
@@ -137,9 +140,10 @@ class ActivityFeedItem extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.only(bottom: 2.0),
       child: Container(
+        color: Colors.white54,
         child: ListTile(
           title: GestureDetector(
-            onTap: () => showPost(context),
+            onTap: () => showProfile(context, profileId: userId),
             child: RichText(
               overflow: TextOverflow.ellipsis,
               text: TextSpan(
@@ -172,7 +176,13 @@ class ActivityFeedItem extends StatelessWidget {
   }
 }
 
-
-showProfile(BuildContext context, { String profileId }) {
-  // Navigator.push(context, mat)
+showProfile(BuildContext context, {String profileId}) {
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => Profile(
+        profileId: profileId,
+      ),
+    ),
+  );
 }

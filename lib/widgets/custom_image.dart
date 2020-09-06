@@ -1,10 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
-cachedNetworkImage(mediaUrl) {
+Widget cachedNetworkImage(String mediaUrl) {
   return CachedNetworkImage(
     imageUrl: mediaUrl,
-    fit: BoxFit.contain,
+    fit: BoxFit.cover,
     placeholder: (context, url) => Padding(
       child: CircularProgressIndicator(),
       padding: EdgeInsets.all(20.0),

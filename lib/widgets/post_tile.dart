@@ -10,12 +10,14 @@ class PostTile extends StatelessWidget {
 
   showPost(context) {
     Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => PostScreen(
-                  postId: post.postId,
-                  userId: post.ownerId,
-                )));
+      context,
+      MaterialPageRoute(
+        builder: (context) => PostScreen(
+          postId: post.postId,
+          userId: post.ownerId,
+        ),
+      ),
+    );
   }
 
   @override
